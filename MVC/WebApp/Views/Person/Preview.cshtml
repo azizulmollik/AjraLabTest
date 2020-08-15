@@ -1,0 +1,46 @@
+﻿@model WebApp.Core.ViewModels.PersonViewModel
+@{
+    ViewBag.Title = "Preview";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@if (Model != null)
+{
+    if (Model.Person != null)
+    {        
+        <div>
+            <div>
+                <h3>Person Detail</h3>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped compact row-border">
+                        <tr>
+                            <td>@Html.DisplayNameFor(model => model.Person.Name)</td>
+                            <td>@Html.DisplayFor(model => model.Person.Name)</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.DisplayNameFor(model => model.Person.LanguageSkills)</td>
+                            <td>@Html.DisplayFor(model => model.Person.LanguageSkills)</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.DisplayNameFor(model => model.Person.DOB)</td>
+                            <td>@Html.DisplayFor(model => model.Person.DOB)</td>
+                        </tr>
+                        <tr>
+                            <td>Download File</td>
+                            <td>
+                                @if (Model.Person.Attachment != null)
+                                {
+                                    <a class="btn btn-sm btn-default" href='@Url.Action("DownloadFile", "Person", new { id = Model.Person.Id })'>@Model.Person.FileName</a>
+                                }
+                                else
+                                { @Html.Raw("N/A")}
+                            </td>
+                        </tr>
+                </table>
+                <br />
+                @Html.ActionLink("Back to List", "Index", "Person", new { id = 0}, new { @class = "btn btn-sm btn-warning" })                
+            </div>
+        </div>
+    }
+}

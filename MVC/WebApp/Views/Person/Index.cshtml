@@ -1,0 +1,261 @@
+﻿@using WebApp.Core.Utlities
+@model WebApp.Core.ViewModels.PersonViewModel
+@{
+    ViewBag.Title = "Personal Information";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<style>
+    input,
+    select,
+    textarea {
+        max-width: 100%;
+    }
+</style>
+<section class="page-header"></section>
+
+<section class="content">
+    @using (Html.BeginForm("Index", "Person", FormMethod.Post, new { enctype = "multipart/form-data", id = "form" }))
+    {
+        if (Model != null)
+        {
+            if (Model.Message != null)
+            {
+                if (Model.Message.MessageType == MessageTypes.Success)
+                {
+                    <div class="alert alert-success alert-dismissible">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <strong>
+                            @Model.Message.CurrentMessage
+                        </strong>
+                    </div>
+                }
+                else if (Model.Message.MessageType == MessageTypes.Warning)
+                {
+                    <div class="alert alert-warning alert-dismissible">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <strong>
+                            @Model.Message.CurrentMessage
+                        </strong>
+                    </div>
+                }
+                else if (Model.Message.MessageType == MessageTypes.Error)
+                {
+                    <div class="alert alert-danger alert-dismissible">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <strong>
+                            @Model.Message.CurrentMessage
+                        </strong>
+                    </div>
+                }
+            }
+        }
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">@ViewBag.Title</h3>
+                        </div>
+                        <div class="box-body">
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        @Html.HiddenFor(model => model.Person.Id)
+                                        @Html.LabelFor(model => model.Person.Name, htmlAttributes: new { @class = "control-label" })
+                                        @Html.TextBoxFor(model => model.Person.Name, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Person.Name, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Person.CountryId, htmlAttributes: new { @class = "control-label" })
+                                        @Html.DropDownListFor(model => model.Person.CountryId, new SelectList(ViewBag.Country, "Value", "Text"), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Person.CountryId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Person.CityId, htmlAttributes: new { @class = "control-label" })
+                                        @Html.DropDownListFor(model => model.Person.CityId, new SelectList(ViewBag.City, "Value", "Text"), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Person.CityId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Person.LanguageSkills, htmlAttributes: new { @class = "control-label" })
+                                        <br />
+                                        @for (int i = 0; i < Model.SkillList.Count(); i++)
+                                        {
+                                            @Html.CheckBoxFor(m => m.SkillList[i].Selected)
+                                            @Html.DisplayFor(m => m.SkillList[i].Skill)
+                                            @Html.HiddenFor(m => m.SkillList[i].Id)
+                                            @Html.HiddenFor(m => m.SkillList[i].Skill)
+                                            <text>&nbsp;</text>
+                                        }
+                                        <br />
+                                        <span class="error text-danger" style="display:none;">Need to select at-least one skill.</span>
+                                        @*@Html.TextBoxFor(model => model.Person.LanguageSkills, new { @class = "form-control" })*@
+                                        @*@Html.ValidationMessageFor(model => model.Person.LanguageSkills, "", new { @class = "text-danger" })*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Person.DOB, htmlAttributes: new { @class = "control-label" })
+                                        @Html.TextBoxFor(model => model.Person.DOB, "{0:dd-MMM-yyyy}", new { @class = "form-control datepicker" })
+                                        @Html.ValidationMessageFor(model => model.Person.DOB, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Person.Attachment, htmlAttributes: new { @class = "control-label" })
+                                        @Html.HiddenFor(model => model.Person.Attachment)
+                                        @Html.HiddenFor(model => model.Person.FileName)
+                                        @Html.HiddenFor(model => model.Person.FileContentType)
+                                        @Html.TextBoxFor(model => model.Person.AttachFile, new { @type = "file", @accept = ".pdf,.doc", @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Person.AttachFile, "", new { @class = "text-danger" })
+                                        <p><b>Accepts .pdf,.doc up to 10MB.</b></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="box-footer">
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-md-offset-2 col-md-10">
+                                        <input type="submit" value="Save" id="btnCreate" class="btn btn-success" />
+                                        @Html.ActionLink("Clear", "Index", "Person", new { id = 0 }, new { @class = "btn btn-default" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    @Html.Partial("_List", Model)
+                </div>
+
+                @*<div class="row">
+                    <table id="data" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Country</th>
+                                <th>City</th>
+                                <th>LanguageSkills</th>
+                                <th>DOB</th>
+                                <th>Action</th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>*@
+            </div>
+        </div>
+    }
+
+
+</section>
+
+<script type="text/javascript">
+    $("#Person_CountryId").change(function () {
+        $("#Person_CityId").empty();
+        var country = $("#Person_CountryId").val();
+        if (country != '')
+            $.ajax({
+                type: 'POST',
+                url: '/Person/GetAllCityByCountryId',
+                dataType: 'json',
+                data: { countryId: country },
+                success: function (res) {
+                    $.each(res, function (i, item) {
+                        $("#Person_CityId").append('<option value="' + item.Value + '">' +
+                            item.Text + '</option>');
+                    });
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve city.' + ex);
+                }
+            });
+        return false;
+    })
+
+    $('#Person_AttachFile').change(function () {
+        var file = this.files[0];
+        name = file.name;
+        size = file.size / 1024;
+
+        if (!(/\.(doc|pdf)$/i).test(name)) {
+            $('#Person_AttachFile').val('');
+            bootbox.alert("File extension is invalid! Please check.");
+        }
+        else {
+            if (size > 1024 * 10) {
+                $('#Person_AttachFile').val('');
+                bootbox.alert("File size is limited to 10 MB! Please check.");
+            }
+        }
+    });
+
+    ////check atleast one skill checked
+    $("#btnCreate").click(function () {
+        var checked_checkboxes = $("input[type=checkbox]:checked");
+        if (checked_checkboxes.length == 0) {
+            $(".error").show();
+            return false;
+        }
+        return true;
+    });
+
+
+    @*GetDataTableData();
+    function GetDataTableData() {
+        $("#data").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "filter": true,
+            "orderMulti": false,
+            "destroy": true,
+            "ordering": true,
+            "ajax": {
+                "url": '/Person/GetDetails',
+                "type": "POST",
+                "datatype": "json"
+            },
+            "columns": [
+                { "data": "Name", "name": "Name", "autoWidth": true },
+                { "data": "Country", "name": "Country", "autoWidth": true },
+                { "data": "City", "name": "City", "autoWidth": true },
+                { "data": "LanguageSkills", "name": "LanguageSkills", "autoWidth": true },
+                { "data": "DOB", "name": "DOB", "autoWidth": true },
+                {
+                    "data": "FileName", "name": "Action", "autoWidth": true,
+                    mRender: function (data, type, full) {
+                        var id = data;
+                        return "<a href='@Url.Action("DownloadFile", "Person", new { id = 0 })'>" + id + "</a>";
+                    }
+                },
+                {
+                    "data": "Name", "name": "Name", "autoWidth": true,
+                    mRender: function (data, type, full) {
+                        var id = data;
+                        return "<p style='background-color:#090;color: white;text-align: center;'>" + id + "</p>";
+                    }
+                }
+
+            ]
+        });
+    }*@
+
+</script>
